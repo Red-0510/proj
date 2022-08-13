@@ -43,10 +43,18 @@
 .download-button{
     margin:5% 3% 5% 0;
 }
+
+
 /* TITLE IMAGE  */ 
+.image-block{
+    position:relative;
+}
+
 .title-image{
     width:60%;
-    transform:rotate(25deg);
+    position:absolute;
+    left:50%;
+    transform:translateX(-50%) rotate(25deg);
 }
 
 /* EMOTES  */
@@ -58,6 +66,10 @@
 }
 
 /* FEATURES  */
+#features{
+    background-color: white;
+    position:relative;
+}
 #features h3{
     font-family:"Montserrat";
     font-weight: 600;
@@ -67,4 +79,106 @@
 
 #features p{
     color:#8f8f8f;
+}
+
+
+
+/* TESTIMONIALS SECTION  */
+#testimonials{
+    text-align:center;
+    color:white;
+    background-color: #ef8172;
+}
+
+.carousel-item{
+    padding:7% 15%;
+}
+
+#testimonials h2{
+    font-family:"Montserrat";
+    font-weight:600;
+    font-size:3rem;
+    line-height:1.5;
+}
+
+.testimonial-image{
+    width:10%;
+    border-radius:100%;
+    margin:20px;
+}
+
+/* PRESS SECTION  */
+
+#press{
+    background-color:#ef8172;
+    text-align: center;
+    padding-bottom:3%;
+}
+
+.press-logo{
+    width:15%;
+    margin:20px 20px 50px;
+}
+
+/* PRICING SECTION  */
+#pricing{
+    text-align:center;
+    padding:100px;
+}
+#pricing h3{
+    font-weight:600;
+
+}
+#pricing h2{
+    font-weight:900;
+}
+
+#pricing p{
+    color:#8f8f8f;
+}
+.pricing-column{
+    padding:3% 2%;
+}
+
+/* CTA SECTION  */
+
+#cta{
+    background-color: #ff4c68;
+    text-align:center;
+    padding:7% 15%;
+}
+
+#cta h3{
+    font-weight:900;
+    color:white;
+    line-height: 1.5;
+    font-size:3.5rem;
+}
+
+/* FOOTER  */
+
+#footer{
+    text-align:center;
+    padding:7% 15%;
+}
+#footer p{
+    color:#8f8f8f;
+}
+
+.icon{
+    margin:5% 3% 5% 0;
+    color:#8f8f8f;
+}
+
+/* MEDIA QUERIES */
+@media screen and (max-width:992px) {
+    #title{
+        text-align:center;
+    }
+    
+    .title-image{
+        position:static;
+        width:40%;
+        transform:rotate(0deg);
+    }
 }
