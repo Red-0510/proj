@@ -2,8 +2,9 @@
 
 const express = require("express");
 const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
 const date = require(__dirname + "/date.js");
-
+const _= require("lodash");
 const app = express();
 
 app.set('view engine', 'ejs');
@@ -11,32 +12,99 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 
-const items = ["Buy Food", "Cook Food", "Eat Food"];
-const workItems = [];
+mongoose.set("strictQuery",true);
+
+mongoose.connect("mongodb://localhost:27017/todolistDB",{
+  useNewUrlParser:true,
+});
+
+const itemSchema = {
+  name:String,
+};
+
+const listSchema = {
+  name: String,
+  items: [itemSchema]
+};
+
+const List = mongoose.model("list",listSchema);
+const Item = mongoose.model("item",itemSchema);
+
 
 app.get("/", function(req, res) {
-
-const day = date.getDate();
-
-  res.render("list", {listTitle: day, newListItems: items});
-
+  Item.find({},(err,items)=>{
+    if(err) {
+      res.send("Uh Oh! Error occured \n" + err);
+    }
+    else res.render("list", {listTitle: "Today", newListItems: items});
+  });
 });
 
 app.post("/", function(req, res){
 
-  const item = req.body.newItem;
+  const itemName = req.body.newItem;
+  const listName=req.body.list;
+  if(itemName.length>1){
+    const item=Item({
+      name:itemName
+    });
+    if(listName==="Today"){
+      item.save();
+      res.redirect("/");
+    }
+    else{
+      List.findOne({name:listName},(err,doc)=>{
+        doc.items.push(item);
+        doc.save();
+        res.redirect("/"+listName);
+      })
+    }
+  }
+  else res.redirect("/");
+});
 
-  if (req.body.list === "Work") {
-    workItems.push(item);
-    res.redirect("/work");
-  } else {
-    items.push(item);
-    res.redirect("/");
+app.post("/delete",(req,res)=>{
+  const item_id=req.body.check;
+  const listName=req.body.list;
+  if(listName==="Today"){
+    Item.findByIdAndRemove(item_id,function(err,doc){
+      if(!err){
+        res.redirect("/");
+      }
+    });
+  }
+  else{
+    List.findOneAndUpdate({name:listName},{
+      $pull:{
+        items:{ _id:item_id }
+      }
+    },(err,doc)=>{
+      if(!err) res.redirect("/"+listName);
+    });
   }
 });
 
-app.get("/work", function(req,res){
-  res.render("list", {listTitle: "Work List", newListItems: workItems});
+app.get("/:listName", (req,res)=>{
+  const listName=_.capitalize(req.params.listName);
+  List.findOne({name:listName},(err,doc)=>{
+    if(doc!=null){
+      res.render("list",{
+        listTitle:listName,
+        newListItems:doc.items
+      });
+    }
+    else{
+      const list= new List({
+        name:listName,
+        items:[]
+      });
+      list.save();
+      res.render("list",{
+        listTitle:listName,
+        newListItems:list.items
+      });
+    }
+  });
 });
 
 app.get("/about", function(req, res){
