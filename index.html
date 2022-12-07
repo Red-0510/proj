@@ -10,7 +10,7 @@
 </head>
 <body>
     <div class="top-container">
-        <img  class="top-cloud" src="CSS - My Site Images/cloud.png" alt="">sdfsadd
+        <img  class="top-cloud" src="CSS - My Site Images/cloud.png" alt="">
         <h1>Red's Den</h1>
         <h2>Welcome to the Den its kinda of a version of a multiverse</h2>
         <img class="bottom-cloud" src="CSS - My Site Images/cloud.png" alt="">
@@ -45,7 +45,10 @@
         </div>
       </div>
       
-      
+      <div class="color">
+        <input type="color" name="color_pick" id="" hidden="hidden">
+      </div>
+      <div class="changer" style="background-color:rgb(255,255,255);"></div>
       <div class="bottom-container">
         <a class="footer-link" href="https://www.linkedin.com/">LinkedIn</a>
         <a class="footer-link" href="https://twitter.com/">Twitter</a>
@@ -55,5 +58,13 @@
       
 
     </div>
+    <script>
+      function colorChange(){
+          let el=document.querySelector(".color")
+        el.background_color=
+        console.log(el);
+      }
+      setInterval(colorChange,500)
+    </script>
 </body>
 </html>

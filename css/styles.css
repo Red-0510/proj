@@ -75,3 +75,16 @@ a{
 .skill-row p{
     clear:left;
 }
+
+.color{
+    height:200px;
+    width:100%;
+    border:3px solid black;
+    animation: color 50s infinite;
+}
+@keyframes color {
+    0%{background-color: red;}
+    33.3%{background-color: blue;}
+    67.6%{background-color: yellow;}
+    100%{background-color: red;}
+}
