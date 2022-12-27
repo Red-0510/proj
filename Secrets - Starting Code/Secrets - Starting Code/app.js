@@ -4,12 +4,16 @@ const express=require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
+var findOrCreate = require('mongoose-findorcreate')
 // const encrypt= require("mongoose-encryption");
 // const bcrypt=require("bcrypt");
 // const saltRounds=10;
 const session = require("express-session");
 const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
+ 
+//google Oauth Part
+var GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 const app = express();
 app.use(bodyParser.urlencoded({extended:true}));
@@ -34,9 +38,11 @@ mongoose.connect("mongodb://localhost:27017/userDB",{useNewUrlParser:true});
 const userSchema =new mongoose.Schema({
     email:String,
     password:String,
+    googleId:String,
 });
 
 userSchema.plugin(passportLocalMongoose,{usernameField:"email"});
+userSchema.plugin(findOrCreate);
 
 // console.log(process.env.SECRET,process.env.API_KEY);
 // userSchema.plugin(encrypt,{secret:process.env.SECRET,encryptedFields:["password"]});
@@ -44,8 +50,37 @@ userSchema.plugin(passportLocalMongoose,{usernameField:"email"});
 const User = mongoose.model("user",userSchema);
 
 passport.use(User.createStrategy());
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
+// passport.serializeUser(User.serializeUser());
+// passport.deserializeUser(User.deserializeUser());
+
+passport.serializeUser(function(user, cb) {
+    process.nextTick(function() {
+      return cb(null, {
+        id: user.id,
+        email: user.email,
+      });
+    });
+  });
+  
+  passport.deserializeUser(function(user, cb) {
+    process.nextTick(function() {
+      return cb(null, user);
+    });
+  });
+
+passport.use(new GoogleStrategy({
+    clientID: process.env.CLIENT_ID,
+    clientSecret: process.env.CLIENT_SECRET,
+    callbackURL: "http://localhost:3000/auth/google/secrets",
+    userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
+  },
+  function(accessToken, refreshToken, profile, cb) {
+    console.log(profile);
+    User.findOrCreate({ googleId: profile.id , email:profile.displayName}, function (err, user) {
+      return cb(err, user);
+    });
+  }
+));
 
 app.get("/",(req,res)=>{
     res.render("home");
@@ -85,6 +120,17 @@ app.get("/logout",(req,res)=>{
         }
     });
 });
+
+app.get("/auth/google",
+    passport.authenticate("google",{scope:["profile"]})
+);
+
+app.get("/auth/google/secrets",
+    passport.authenticate("google",{failureRedirect:"/login"}),
+    (req,res)=>{
+        res.redirect("/secrets");
+    }
+);
 
 
 // posts routes
